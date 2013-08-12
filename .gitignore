@@ -1,1 +1,6 @@
 *.class
+.DS_Store
+TopicWordTool/.DS_Store
+TopicWordTool/TopicWords-v2/.DS_Store
+TopicWordTool/ts
+TopicWordTool/ts_full
