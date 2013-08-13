@@ -1,5 +1,10 @@
-import java.util.*;
+/* Usage:
+ * 
+ * ?> java Summarizer
+ *
+ */
 
+import java.util.*;
 
 public class Summarizer {
 
