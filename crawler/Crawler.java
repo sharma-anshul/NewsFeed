@@ -1,13 +1,18 @@
 import java.util.*;
 import java.net.*;
 import java.io.*;
+import de.l3s.boilerpipe.extractors.DefaultExtractor;
+import de.l3s.boilerpipe.extractors.ArticleExtractor;
 
 public class Crawler {
 		public static void main(String[] args) {
 				try {
-						String page = getPage("http://google.com");
-						System.out.println(page);
+						String page = getPage("http://" + args[0]);
+						String text = getText(page);
+						System.out.println(text);
 				} catch(IOException e) {
+						e.printStackTrace();
+				} catch(Exception e) {
 						e.printStackTrace();
 				}
 		}
@@ -24,5 +29,13 @@ public class Crawler {
 		    	in.close();
 
 		    	return page;
+		}
+		
+		//Removes boilerplate(HTML tags, ads etc) and returns main text
+		public static String getText(String page) throws Exception {
+				DefaultExtractor extractor = DefaultExtractor.getInstance();
+				String text = extractor.getText(page);
+
+				return text;
 		}
 }
