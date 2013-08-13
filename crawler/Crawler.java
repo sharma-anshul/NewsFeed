@@ -1,3 +1,9 @@
+/* Usage:
+ *
+ * ?> java Crawler URL 
+ *
+ */
+
 import java.util.*;
 import java.net.*;
 import java.io.*;
@@ -7,7 +13,8 @@ import de.l3s.boilerpipe.extractors.ArticleExtractor;
 public class Crawler {
 		public static void main(String[] args) {
 				try {
-						String page = getPage("http://" + args[0]);
+						String url = args[0].startsWith("http://") ? args[0] : "http://" + args[0];
+						String page = getPage(url);
 						String text = getText(page);
 						System.out.println(text);
 				} catch(IOException e) {
