@@ -14,23 +14,6 @@ import de.l3s.boilerpipe.extractors.DefaultExtractor;
 import de.l3s.boilerpipe.extractors.ArticleExtractor;
 
 public class Crawler {
-		public static void main(String[] args) {
-				try {
-						String url = args[0].startsWith("http://") ? args[0] : "http://" + args[0];
-						int limit = Integer.parseInt(args[1]);
-
-						HashSet<String> links = getLinks(url, limit);
-						
-						for (String link: links) {
-								System.out.println(link);
-						}
-
-				} catch(IOException e) {
-						e.printStackTrace();
-				} catch(Exception e) {
-						e.printStackTrace();
-				}
-		}
 		
 		//Given a link, get n more links from the same domain
 		public static HashSet<String> getLinks(String url, int limit) throws Exception {

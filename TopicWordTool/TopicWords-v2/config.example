@@ -6,8 +6,8 @@ topicWordCutoff = 0.1
 
 ==== Directory to compute topic words on ====
 
-inputDir = /home1/c/cis530/hw1/TopicWords-v1/sampleTexts/input-cluster1
+inputDir = ./test
 
 ==== Output File ====
 
-outputFile = /home1/c/yourpennkey/myoutputfile.ts
+outputFile = ./test.ts
