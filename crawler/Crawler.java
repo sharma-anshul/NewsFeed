@@ -1,9 +1,3 @@
-/* Usage:
- *
- * ?> java Crawler URL LIMIT
- *
- */
-
 import java.io.*;
 import java.net.*;
 import java.util.HashSet;

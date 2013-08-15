@@ -1,3 +1,10 @@
+/* Usage:
+ * 
+ * ?> java Test URL LIMIT
+ *
+ */
+
+
 import java.io.*;
 import crawler.*;
 import summarizer.*;
@@ -12,7 +19,8 @@ public class Test {
 						int limit = Integer.parseInt(args[1]);
 						
 						HashSet<String> links = Crawler.getLinks(url, limit);
-		
+						
+						System.out.println("\nCrawled links:\n");
 						for (String link: links) {
 								System.out.println(link);
 						}
@@ -20,6 +28,7 @@ public class Test {
 						HashMap<String, Double> topicWords = Summarizer.getTopicWords();
 						ArrayList<String> topNTopicWords = Summarizer.getTopNTopicWords(topicWords, 10);
 						
+						System.out.println("\nTop 10 topic words from the test file:\n");
 						for (String word: topNTopicWords) {
 						        System.out.println(word);
 						}
