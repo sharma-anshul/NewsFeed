@@ -5,13 +5,21 @@
  */
 
 import java.io.*;
+import java.util.Map;
 import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class Summarizer {
 		public static void main(String[] args) {
 				try {
-						getTopicWords();
+						ArrayList<String> topNTopicWords = getTopNTopicWords(getTopicWords(), 10);
+				
+						for (String word: topNTopicWords) {
+								System.out.println(word);
+						}
 				} catch(IOException e) {
 						e.printStackTrace();
 				} catch(Exception e) {
@@ -36,5 +44,30 @@ public class Summarizer {
 				}
 
 				return topicWords;
+		}
+
+		//Gets top n Topic Words
+		public static ArrayList<String> getTopNTopicWords(HashMap<String, Double> topicWords, int n) {
+				ArrayList as = new ArrayList(topicWords.entrySet());  
+				Collections.sort(as , new Comparator() {  
+				        public int compare(Object o1, Object o2) {  
+				        		Map.Entry e1 = (Map.Entry)o1 ;  
+								Map.Entry e2 = (Map.Entry)o2 ;  
+				        		
+				        		Double first = (Double)e1.getValue();  
+				        		Double second = (Double)e2.getValue();  
+				        		
+				        		return first.compareTo(second);  
+				        }  
+				});
+				
+				int limit = (as.size() - n) > 0 ? (as.size() - n) : 0;
+				ArrayList<String> topNTopicWords = new ArrayList<String>();
+				for (int i = as.size() - 1; i >= limit; i--) {
+						Map.Entry e = (Map.Entry)as.get(i);
+						topNTopicWords.add((String)e.getKey());
+				}
+
+				return topNTopicWords;
 		}
 }
