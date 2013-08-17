@@ -16,23 +16,10 @@ public class Test {
 		public static void main(String[] args) {
 				try {
 						String url = args[0].startsWith("http://") ? args[0] : "http://" + args[0];
-						int limit = Integer.parseInt(args[1]);
-						
-						HashSet<String> links = Crawler.getLinks(url, limit);
-						
-						System.out.println("\nCrawled links:\n");
-						for (String link: links) {
-								System.out.println(link);
-						}
-						
-						HashMap<String, Double> topicWords = Summarizer.getTopicWords();
-						ArrayList<String> topNTopicWords = Summarizer.getTopNTopicWords(topicWords, 10);
-						
-						System.out.println("\nTop 10 topic words from the test file:\n");
-						for (String word: topNTopicWords) {
-						        System.out.println(word);
-						}
+						String text = Crawler.getText(Crawler.getPage(url));
 
+						Summarizer.summarize(text);
+						
 				} catch(IOException e) {
 						e.printStackTrace();
 				} catch(Exception e) {
