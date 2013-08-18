@@ -16,7 +16,7 @@ public class Summarizer {
 		public static String summarize(String text) throws Exception{
 				File file = new File(topicWordRoot + "test");
 				PrintWriter pw = new PrintWriter(file);
-				pw.print(text); pw.close();
+				pw.print(text); pw.flush(); pw.close();
 
 				ArrayList<String> topicWords = getTopNTopicWords(getTopicWords(), 10);
 				for (String word: topicWords) {
@@ -31,11 +31,12 @@ public class Summarizer {
 				int start = iterator.first();
 				for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator.next()) {
 						String sentence = text.substring(start, end);
-						if (sentence.endsWith("\n")) {
-								sentence = sentence.substring(0, sentence.length() - 1);
-						}
-						if (sentence.endsWith(".")) {
-								sentences.add(sentence);
+						String[] sentenceParts = sentence.split("\n");
+						
+						for (String part: sentenceParts) {
+								if (part.endsWith(".")) {
+										sentences.add(part);
+								}
 						}
 				}
 				
@@ -50,7 +51,10 @@ public class Summarizer {
 		
 		//Gets top sentences based on the number of Topic Words it contains
 		public static ArrayList<String> getTopNSentences(ArrayList<String> sentences, ArrayList<String> topicWords, int n) {
+				HashMap<String, Double> sentencePosition = new HashMap<String, Double>();
 				HashMap<String, Double> topicSentences = new HashMap<String, Double>();
+				
+				double position = 0.0;
 				for (String sentence: sentences) {
 						double score = 0.0;
 						String[] words = sentence.split("\\s|,|'|;|:|\"");
@@ -62,22 +66,42 @@ public class Summarizer {
 								}
 						}
 						topicSentences.put(sentence, score);
+						sentencePosition.put(sentence, position);
+						position += 1.0;
 				}
 				
 				ArrayList<String> topSentences = getTopN(topicSentences, n);
+				HashMap<String, Double> temp = new HashMap<String, Double>();
+
+				//Sorts top Topic sentences according to position in article to maintain coherence
+				for (String sentence: topSentences) {
+						double pos = sentencePosition.get(sentence);
+						temp.put(sentence, position - pos);
+				}
 				
-				return topSentences;
+				ArrayList<String> sortedTopSentences = getTopN(temp, topSentences.size());
+
+				return sortedTopSentences;
 		}
 
 		//Performs Topic Analysis on article to get Topic Words
 		public static HashMap<String, Double> getTopicWords() throws Exception {
 				Process p = Runtime.getRuntime().exec("./Topic.sh");
 				p.waitFor();
+				
+				BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream())); 
+				StringBuffer sb = new StringBuffer();								 
+				String line = reader.readLine();
+				sb.append(line);
+				while (line != null) {
+						line = reader.readLine();
+						sb.append(line);
+				}
 
 				File ts = new File(topicWordRoot + "test.ts");
 				BufferedReader in = new BufferedReader(new FileReader(ts));
 				HashMap topicWords = new HashMap<String, Double>();
-				String line;
+				line = "";
 				while((line = in.readLine()) != null) {
 						String word = line.split("\\s")[0];
 						double score = Double.parseDouble(line.split("\\s")[1]);
