@@ -1,6 +1,6 @@
 /* Usage:
  * 
- * ?> java Test URL LIMIT
+ * ?> java Test URL
  *
  */
 
