@@ -106,10 +106,49 @@
 			}
 
 			return json_encode($res);			
-		}		
+		}
+
+		/**
+		 * Store new row in table
+		 *
+		 * @return True if success, False otherwise
+		 *
+		 * @access public
+		 */
+		public function addSummary($url, $topWords, $summary) {
+			if(!$this->_checkForConnection()) {
+		    	return false;
+			}
+			
+			$success = false;
+			$query  =
+					'INSERT INTO urls ' .
+					'(url, top_words, summary) ' .
+					'VALUES (?, ?, ?)';
+			
+			if($statement = $this->mysqlConn->prepare($query)) {
+				$statement->bind_param('sss', $url, $topWords, $summary);
+				$success = $this->_executeSQLStatement($statement);
+				$statement->close();
+			}
+			return $success;
+		}
 			
 	}
 	
 	$nfapi = new NewsFeedAPI();
-	echo $nfapi->getEverything();
+
+	$url = $_SERVER['REQUEST_URI'];
+	$parsed_url = parse_url($url);
+	$path = $parsed_url["path"];
+	
+	echo $path;
+	echo "true";
+	$root = '';
+
+	if($path === ($root.'/api.php/addSummary')) {
+		echo 'inside function';
+		echo $nfapi->addSummary($_GET['url'], $_GET['topWords'], $_GET['summary']);
+	}
+	//echo $nfapi->getEverything();
 ?>

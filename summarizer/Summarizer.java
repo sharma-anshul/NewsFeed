@@ -13,17 +13,7 @@ public class Summarizer {
 		private static String topicWordRoot = "../TopicWordTool/TopicWords-v2/";
 
 		//Summarize file based on Topic Words
-		public static String summarize(String text) throws Exception{
-				File file = new File(topicWordRoot + "test");
-				PrintWriter pw = new PrintWriter(file);
-				pw.print(text); pw.flush(); pw.close();
-
-				ArrayList<String> topicWords = getTopNTopicWords(getTopicWords(), 10);
-				for (String word: topicWords) {
-						System.out.println(word);
-				}
-				System.out.println("\n");
-
+		public static String summarize(String text, ArrayList<String> topicWords) throws Exception{
 				ArrayList<String> sentences = new ArrayList<String>();
 				BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.US);
 				iterator.setText(text);
@@ -41,14 +31,14 @@ public class Summarizer {
 				}
 				
 				ArrayList<String> topSentences = getTopNSentences(sentences, topicWords, 10);
-
+				String summary = "";
 				for (String sentence: topSentences) {
-						System.out.println(sentence);
+						summary += sentence + " ";
 				}
 
-				return "";
+				return summary;
 		}
-		
+
 		//Gets top sentences based on the number of Topic Words it contains
 		public static ArrayList<String> getTopNSentences(ArrayList<String> sentences, ArrayList<String> topicWords, int n) {
 				HashMap<String, Double> sentencePosition = new HashMap<String, Double>();
@@ -113,7 +103,13 @@ public class Summarizer {
 		}
 
 		//Gets top n Topic Words
-		public static ArrayList<String> getTopNTopicWords(HashMap<String, Double> topicWords, int n) {
+		public static ArrayList<String> getTopNTopicWords(String text, int n) throws Exception {
+				
+				File file = new File(topicWordRoot + "test");
+                PrintWriter pw = new PrintWriter(file);
+				pw.print(text); pw.flush(); pw.close();
+				
+				HashMap<String, Double> topicWords = getTopicWords();
 				ArrayList<String> topNTopicWords = getTopN(topicWords, n);
 
 				return topNTopicWords;
