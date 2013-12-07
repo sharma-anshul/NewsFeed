@@ -1,6 +1,5 @@
 <?php
-		
-		
+				
 	class NewsFeedAPI {
 			
 		public $mysqlConn;

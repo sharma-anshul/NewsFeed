@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.Map;
+import java.lang.Math;
 import java.util.Locale;
 import java.util.HashMap;
 import java.util.Collections;
@@ -43,14 +44,18 @@ public class Summarizer {
 		public static ArrayList<String> getTopNSentences(ArrayList<String> sentences, ArrayList<String> topicWords, int n) {
 				HashMap<String, Double> sentencePosition = new HashMap<String, Double>();
 				HashMap<String, Double> topicSentences = new HashMap<String, Double>();
-				
+				Set<String> tempVocab = new Set<String>();
+				vocabulary = new ArrayList<String>();
+
 				double position = 0.0;
 				for (String sentence: sentences) {
 						double score = 0.0;
-						String[] words = sentence.split("\\s|,|'|;|:|\"");
+						String[] words = getWords(sentence);
 						for (String word: words) {
+								word = word.trim().toLowerCase();
+								tempVocab.add(word);
 								if (!word.trim().equals("")) {
-										if (topicWords.contains(word.trim().toLowerCase())) {
+										if (topicWords.contains(word)) {
 												score += 1.0;
 										}
 								}
@@ -60,6 +65,7 @@ public class Summarizer {
 						position += 1.0;
 				}
 				
+				vocabulary.addAll(tempVocab);
 				ArrayList<String> topSentences = getTopN(topicSentences, n);
 				HashMap<String, Double> temp = new HashMap<String, Double>();
 
@@ -130,13 +136,77 @@ public class Summarizer {
 						}
 				});
 				
-				int limit = (as.size() - n) > 0 ? (as.size() - n) : 0;
+				//int limit = (as.size() - n) > 0 ? (as.size() - n) : 0;
 				ArrayList<String> topNThings = new ArrayList<String>();
-				for (int i = as.size() - 1; i >= limit; i--) {
+				for (int i = as.size() - 1; i >= 0; i--) {
+						
 						Map.Entry e = (Map.Entry)as.get(i);
-						topNThings.add((String)e.getKey());
+						String sentence = (String)e.getKey();
+						
+						if (vocabulary.size() > 0) {
+								boolean addSentence = true;
+								ArrayList<String> vec1 = getVector(sentence);
+								
+								for (String other: topNThings) {
+										ArrayList<String> vec2 = getVector(other);
+										double similarity = getCosineSimilarity(vec1, vec2);
+										if (similarity > 0.4) {
+												addSentence = false;
+												break;
+										}	
+								}
+
+								if (addSentence) {
+										topNThings.add(sentence);
+								}
+
+						} else {			
+								topNThings.add(sentence);
+						}
+
+						if (topNThings.size() == n) {
+								break;
+						}
 				}
 				
 				return topNThings;
 		}
+		
+		//Calculate cosine similarity
+		public static double getCosineSimilarity(ArrayList<Integer> vec1, ArrayList<Integer> vec2) {
+				int numerator = 0, denominator1 = 0, denominator2 = 0;
+				
+				for (int i = 0; i < vec1.size(); i++) {
+						numerator += vec1[i] * vec2[i];
+						denominator1 += Math.pow(vec1[i], 2);
+						denominator2 += Math.pow(vec2[i], 2);
+				}
+				
+				if (denominator1 == 0 || denominator2 == 0) {
+						return 1.0;
+				} else {
+						return (numerator / (Math.pow(denominator1, 0.5) + Math.pow(denominator2, 0.5)));
+				}
+		}
+
+		//Get sentence vector
+		public static ArrayList<Integer> getVector(String sentence) {
+				String[] words = getWords(sentence);
+				ArrayList<Integer> vector = new ArrayList<Integer>();
+
+				for (String word: words) {
+						int index = vocabulary.indexOf(word);
+						vector[index] = 1;
+				}
+
+				return vector;
+		}
+		
+		public static String[] getWords(String sentence) {
+				return sentence.split("\\s|,|'|;|:|\"");
+		}
+
+		private static String topicWordRoot = "../TopicWordTool/TopicWords-v2/";
+		private static ArrayList<String> vocabulary;
+
 }
