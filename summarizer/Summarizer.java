@@ -3,6 +3,7 @@ import java.util.Map;
 import java.lang.Math;
 import java.util.Locale;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ArrayList;
@@ -10,8 +11,6 @@ import java.util.LinkedHashMap;
 import java.text.BreakIterator;
 
 public class Summarizer {
-		
-		private static String topicWordRoot = "../TopicWordTool/TopicWords-v2/";
 
 		//Summarize file based on Topic Words
 		public static String summarize(String text, ArrayList<String> topicWords) throws Exception{
@@ -44,7 +43,7 @@ public class Summarizer {
 		public static ArrayList<String> getTopNSentences(ArrayList<String> sentences, ArrayList<String> topicWords, int n) {
 				HashMap<String, Double> sentencePosition = new HashMap<String, Double>();
 				HashMap<String, Double> topicSentences = new HashMap<String, Double>();
-				Set<String> tempVocab = new Set<String>();
+				HashSet<String> tempVocab = new HashSet<String>();
 				vocabulary = new ArrayList<String>();
 
 				double position = 0.0;
@@ -136,35 +135,32 @@ public class Summarizer {
 						}
 				});
 				
-				//int limit = (as.size() - n) > 0 ? (as.size() - n) : 0;
 				ArrayList<String> topNThings = new ArrayList<String>();
 				for (int i = as.size() - 1; i >= 0; i--) {
 						
 						Map.Entry e = (Map.Entry)as.get(i);
 						String sentence = (String)e.getKey();
-						
-						if (vocabulary.size() > 0) {
-								boolean addSentence = true;
-								ArrayList<String> vec1 = getVector(sentence);
+						boolean addSentence = true;	
+
+						if (vocabulary != null && vocabulary.size() > 0) {
+								ArrayList<Integer> vec1 = getVector(sentence);
 								
 								for (String other: topNThings) {
-										ArrayList<String> vec2 = getVector(other);
+										ArrayList<Integer> vec2 = getVector(other);
 										double similarity = getCosineSimilarity(vec1, vec2);
 										if (similarity > 0.4) {
 												addSentence = false;
 												break;
 										}	
 								}
+						}
 
-								if (addSentence) {
-										topNThings.add(sentence);
-								}
-
-						} else {			
+						if (addSentence) {
 								topNThings.add(sentence);
 						}
 
-						if (topNThings.size() == n) {
+
+						if (topNThings.size() >= n) {
 								break;
 						}
 				}
@@ -177,9 +173,9 @@ public class Summarizer {
 				int numerator = 0, denominator1 = 0, denominator2 = 0;
 				
 				for (int i = 0; i < vec1.size(); i++) {
-						numerator += vec1[i] * vec2[i];
-						denominator1 += Math.pow(vec1[i], 2);
-						denominator2 += Math.pow(vec2[i], 2);
+						numerator += vec1.get(i) * vec2.get(i);
+						denominator1 += Math.pow(vec1.get(i), 2);
+						denominator2 += Math.pow(vec2.get(i), 2);
 				}
 				
 				if (denominator1 == 0 || denominator2 == 0) {
@@ -192,11 +188,12 @@ public class Summarizer {
 		//Get sentence vector
 		public static ArrayList<Integer> getVector(String sentence) {
 				String[] words = getWords(sentence);
-				ArrayList<Integer> vector = new ArrayList<Integer>();
+				ArrayList<Integer> vector = new ArrayList<Integer>(Collections.nCopies(vocabulary.size(), 0));
 
 				for (String word: words) {
+						word = word.trim().toLowerCase();
 						int index = vocabulary.indexOf(word);
-						vector[index] = 1;
+						vector.set(index, 1);
 				}
 
 				return vector;

@@ -22,10 +22,11 @@ public class Test {
 						ArrayList<String> topicWords = Summarizer.getTopNTopicWords(text, 10);
 						String summary = Summarizer.summarize(text, topicWords);
 						
+						/*
 						if (url.startsWith("http://")) {
 								url = url.substring(7, url.length());
 						}
-
+					
 						URL apiURL = new URL("http://newsfeed.net84.net/api.php/addSummary?url=" + url + 
 											"&topWords=" + encodeTopicWords(topicWords) +
 											"&summary=" + summary);
@@ -41,7 +42,8 @@ public class Test {
 						}
 
 						in.close();
-							
+						*/
+
 						System.out.println(summary);
 						
 				} catch(IOException e) {
